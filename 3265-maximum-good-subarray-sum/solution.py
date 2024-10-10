@@ -1,24 +1,18 @@
+from collections import defaultdict
 class Solution:
     def maximumSubarraySum(self, nums: List[int], k: int) -> int:
-        n = len(nums)
-        psum = [0]*(n+1)
-        for i in range(n):
-            psum[i+1] = psum[i] + nums[i]
-        memo = dict()
-        res = -1e18
-        for i in range(n):
-            x = nums[i] - k
-            y = nums[i] + k
+        value2sum = defaultdict(lambda:1e15+1)
+        c_sum = defaultdict(int)
 
-            if x in memo.keys():
-                res = max(res, psum[i+1] - memo[x])
-            if y in memo.keys():
-                res = max(res, psum[i+1] - memo[y])
-            if not nums[i] in memo.keys():
-                memo[nums[i]] = psum[i]
-            else:
-                memo[nums[i]] = min(memo[nums[i]],psum[i])
-    
-        if res == -1e18:
-            res = 0
-        return res
+        result = -1e14-1
+        temp_sum = 0
+        for idx, value in enumerate(nums):
+            temp_sum += value
+            value2sum[value] = min(value2sum[value], temp_sum)
+            c_sum[idx] = temp_sum
+
+            if value + k in value2sum.keys():
+                result = max(result, c_sum[idx] - (value2sum[value+k]) + value + k)
+            if value - k in value2sum.keys():
+                result = max(result, c_sum[idx] - (value2sum[value-k]) + value - k)
+        return 0 if result == -1e14-1 else result
